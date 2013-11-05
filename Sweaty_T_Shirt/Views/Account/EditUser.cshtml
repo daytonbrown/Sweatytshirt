@@ -1,0 +1,224 @@
+﻿@model Sweaty_T_Shirt.Models.UserProfile
+@{
+    Layout = "~/Views/Shared/_LayoutIFrame.cshtml";
+    ViewBag.Title = "Edit User";
+}
+
+@section scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#Cancel').click(function () {
+                parent.$.colorbox.close();
+            });
+
+            //this rewires the DeleteUserInCompetition link to confirm deletion in popup.  
+            $('.delete-userincompetition-warning').on('click', function () {
+                $('#deleteUserInCompetitionName').text($(this).attr('competitionName'));
+                var href = $(this).attr('href');
+                $('#deleteUserInCompetitionButton').on('click', function () {
+                    document.location.href = href;
+                });
+                $.colorbox({ inline: true, href: '#deleteUserInCompetitionAlert', open: true, width: '350px', height: "350px" });
+                return false;
+            });
+
+            //this re-wires the DeleteCompetition link to do a colorbox warning
+            $('a.delete-competition-warning').on('click', function () {
+                $('#deleteCompetitionName').text($(this).attr('competitionName'));
+                var href = $(this).attr('href');
+                $('#deleteCompetitionButton').on('click', function () {
+                    document.location.href = href;
+                });
+                $.colorbox({ inline: true, href: '#deleteCompetitionAlert', open: true, width: '350px', height: "350px" });
+                return false;
+            });
+
+            //this re-wires the DeleteSweatyTShirt link to do a colorbox warning
+            $('a.delete-sweatytshirt-warning').on('click', function () {
+                $('#deleteSweatyTShirtDescription').text($(this).attr('description'));
+                var href = $(this).attr('href');
+                $('#deleteSweatyTShirtButton').on('click', function () {
+                    document.location.href = href;
+                });
+                $.colorbox({ inline: true, href: '#deleteSweatyTShirtAlert', open: true, width: '350px', height: "350px" });
+                return false;
+            });
+        });
+    </script>
+}
+
+<div style="display:none">
+    <div id="deleteUserInCompetitionAlert">
+        <p>Delete user from <span id="deleteUserInCompetitionName"></span>?</p>
+        <p>Click "Yes" to complete the deletion or click "Cancel" to cancel this action.</p>
+        <div>
+            <button id="deleteUserInCompetitionButton" value="Yes">Yes</button>
+            <input type="button" onclick="$.colorbox.close();" value="Cancel" />
+        </div>
+   </div>
+</div>
+
+<div style="display:none">
+    <div id="deleteCompetitionAlert">
+        <p>
+            Delete competition <span id="deleteCompetitionName"></span>?
+        </p>
+        <p>If any users have been added to this competition their sweaty-t-shirts will also be deleted.</p>
+        <p>Click "Yes" to proceed with the delete, otherwise click "Cancel"</p>
+        <input type="button" id="deleteCompetitionButton" value="Yes" />
+        <input type="button" onclick="$.colorbox.close();" value="Cancel" />
+    </div>
+</div>
+
+<div style="display:none">
+    <div id="deleteSweatyTShirtAlert">
+        <p>
+            Delete <span id="deleteSweatyTShirtDescription"></span>?
+        </p>
+        <p>Click "Yes" to proceed with the delete, otherwise click "Cancel"</p>
+        <input type="button" id="deleteSweatyTShirtButton" value="Yes" />
+        <input type="button" onclick="$.colorbox.close();" value="Cancel" />
+    </div>
+</div>
+
+<h2>Edit User</h2>
+
+@using (Html.BeginForm("EditUser", "Account", FormMethod.Post))
+{
+    @Html.HiddenFor(m => m.UserId)
+    @Html.HiddenFor(m => m.UserName)
+    <div>
+	    <span class="message-error">@Html.ValidationSummary(false, "Please correct the following.")</span>
+	</div>
+    
+    <table>
+	    <tr>
+		    <td><button id="Save" type="submit" value="Save">Save</button></td>
+            <td><button id="Cancel" type="button" value="Cancel">Close</button></td>
+	    </tr>
+    </table>
+    
+    <table>
+        <tr>
+            <td>@Html.LabelFor(m => m.FullName)</td>
+            <td>@Html.EditorFor(m => m.FullName)</td>
+        </tr>
+        <tr>
+            <td>@Html.LabelFor(m => m.Email)</td>
+            <td>@Html.EditorFor(m => m.Email)</td>
+        </tr>
+        <tr>
+            <td>@Html.LabelFor(m => m.UserRoles)</td>
+            <td>
+                @for (int i = 0; i < Model.UserRoles.Count; i++)
+                {
+                    @* TODO put this is an editor template. *@
+                    <span>@Model.UserRoles[i].Text</span>
+                    @Html.CheckBoxFor(m => m.UserRoles[i].Selected)
+                    @Html.HiddenFor(m => m.UserRoles[i].Value)
+                    @Html.HiddenFor(m => m.UserRoles[i].Text)
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>@Html.LabelFor(m => m.UserName)</td>
+            <td>@Model.UserName</td>
+        </tr>
+     </table>
+}
+@if (Model.UserInCompetitions != null && Model.UserInCompetitions.Count > 0)
+{
+    <fieldset>
+        <legend>Competitions In</legend>
+        @if (Model.UserInCompetitions != null && Model.UserInCompetitions.Count > 0)
+        {
+            var grid = new WebGrid(Model.UserInCompetitions, canPage: false, canSort: false);
+            @grid.GetHtml(tableStyle: "webgrid",
+                rowStyle: "webgrid-row",
+                alternatingRowStyle: "webgrid-alternating-row",
+                columns: grid.Columns(
+                            grid.Column(columnName: "Competition.Name", header: "Competitions this user is in"),
+                            grid.Column(header: string.Empty, format: item => Html.ActionLink(item.IsActive ? "Deactivate" : "Activate",
+                                    "ToggleUserInCompetition",
+                                    "Competition",
+                                    new
+                                    {
+                                        competitionID = item.CompetitionID,
+                                        userID = item.UserID,
+                                        redirectToAction = "EditUser",
+                                        redirectToController = "Account"
+                                    }, new { })),
+                            grid.Column(header: string.Empty, format: item => Html.ActionLink("Delete User From Competition", 
+                                "DeleteUserInCompetition",
+                                "Competition",
+                                new
+                                {
+                                    competitionID = item.CompetitionID,
+                                    userID = item.UserID,
+                                    redirectToAction = "EditUser",
+                                    redirectToController = "Account"
+                                },
+                                    new
+                                    {
+                                        @class = "delete-userincompetition-warning",
+                                        @competitionName = item.Competition.Name
+                                    }))
+            ))
+        }
+    </fieldset>
+}
+@if (Model.SweatyTShirts != null && Model.SweatyTShirts.Count > 0)
+{
+    <fieldset>
+        <legend>Sweaty-T-Shirts</legend>
+
+        @{  var grid = new WebGrid(Model.SweatyTShirts, canPage: false, canSort: false);
+            @grid.GetHtml(tableStyle: "webgrid",
+                rowStyle: "webgrid-row",
+                alternatingRowStyle: "webgrid-alternating-row",
+                columns: grid.Columns(
+                    grid.Column(columnName: "Competition.Name", header: "Competition"),
+                    grid.Column(columnName: "Description", header: "Sweaty T-Shirt"),
+                    grid.Column(columnName: "Amount", header: "Amount"),
+                    grid.Column(columnName: "CreatedDate", header: "Date Submitted", format: item => string.Format("{0:d}", item.CreatedDate)),
+                    grid.Column(header: string.Empty,
+                     format: item => Html.ActionLink("Delete", "DeleteSweatyTShirtWithRedirect", "Competition",
+                        new
+                        {
+                            sweatyTShirtID = item.SweatyTShirtID,
+                            userID = item.UserID,
+                            redirectToAction = "EditUser",
+                            redirectToController = "Account"
+                        },
+                        new { @class = "delete-sweatytshirt-warning", @description = item.Description + "(" + item.Amount + ")" }))
+            ))
+        }
+    </fieldset>
+}
+@if (Model.Competitions != null && Model.Competitions.Count > 0)
+{
+    <fieldset>
+        <legend>Competitions Created</legend>
+        @{  var grid = new WebGrid(Model.Competitions, canPage: false, canSort: false);
+            @grid.GetHtml(tableStyle: "webgrid",
+                rowStyle: "webgrid-row",
+                alternatingRowStyle: "webgrid-alternating-row",
+                columns: grid.Columns(
+                            grid.Column(columnName: "Name", header: "Competitions Created by this user"),
+                            grid.Column(header: string.Empty,
+                            format: item => Html.ActionLink("Delete Competition", 
+                                "DeleteCompetitionWithRedirect",
+                                "Competition",
+                             new
+                             {
+                                 competitionID = item.CompetitionID,
+                                 userID = item.CreatorUserID,
+                                 redirectToAction = "EditUser",
+                                 redirectToController = "Account"
+                             },
+                                new { @class = "delete-competition-warning", @competitionName = item.Name }))
+            ))
+        }
+    </fieldset>
+}

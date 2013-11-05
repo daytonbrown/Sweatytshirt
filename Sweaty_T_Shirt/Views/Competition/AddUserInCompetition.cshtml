@@ -1,0 +1,54 @@
+﻿@model Sweaty_T_Shirt.Models.UserInCompetition
+@{
+    ViewBag.Title = "Add User(s) To Competition";
+    Layout = "~/Views/Shared/_LayoutIFrame.cshtml";
+}
+@section scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#Cancel').click(function () {
+                parent.$.colorbox.close();
+            });
+        });
+    </script>
+}
+
+<h2>Add User To Competition</h2>
+
+@using (Html.BeginForm("AddUserInCompetition", "Competition", FormMethod.Post))
+{
+    @Html.HiddenFor(m => m.CompetitionID)
+    @Html.HiddenFor(m => m.UserID)
+    @Html.HiddenFor(m => m.Competition.Name)
+    @Html.HiddenFor(m => m.Competition.UserProfile.FullName)
+    <div>
+	    <span class="message-error">@Html.ValidationSummary(false, "Please correct the following.")</span>
+	</div>
+
+    <p>Enter the name and email address of the person you want to add to 
+    the @Model.Competition.Name competition and click "Save."</p>
+    
+    <p>To close this window without taking any action click "Close."</p>
+    <table>
+	    <tr>
+		    <td><button id="Save" type="submit" value="Save">Save</button></td>
+            <td><button id="Cancel" type="button" value="Cancel">Close</button></td>
+	    </tr>
+    </table>
+    
+    <table>
+        <tr>
+            <td>@Html.LabelFor(m => m.FullName)</td>
+            <td>@Html.EditorFor(m => m.FullName)</td>
+        </tr>
+        <tr>
+            <td>@Html.LabelFor(m => m.Email)</td>
+            <td>@Html.EditorFor(m => m.Email)</td>
+        </tr>
+        <tr>
+            <td>@Html.LabelFor(m => m.SendEmail)</td>
+            <td>@Html.EditorFor(m => m.SendEmail)</td>
+        </tr>
+    </table>
+}

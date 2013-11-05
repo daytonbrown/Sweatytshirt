@@ -1,0 +1,58 @@
+﻿@model List<Sweaty_T_Shirt.Models.Competition>
+@{
+    ViewBag.Title = "Competitions I Created";
+}
+
+@section scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            /*this re-wires the "Edit" link to do a colorbox popup instead of posting back to server.*/
+            $('a.edit-competition-popup').on('click', function () {
+                $.colorbox({ href: $(this).attr('href'), open: true, iframe: true, scrolling: true, width: '700px', height: "700px" });
+                return false;
+            });
+
+            //this re-wires the DeleteCompetition link to do a colorbox warning
+            $('a.delete-competition-warning').on('click', function () {
+                $('#deleteCompetitionName').text($(this).attr('competitionName'));
+                var href = $(this).attr('href');
+                $('#deleteCompetitionButton').on('click', function () {
+                    document.location.href = href;
+                });
+                $.colorbox({ inline: true, href: '#deleteCompetitionAlert', open: true, width: '350px', height: "350px" });
+                return false;
+            });
+        });
+    </script>
+}
+
+<div style="display:none">
+    <div id="deleteCompetitionAlert">
+        <p>
+            Delete competition <span id="deleteCompetitionName"></span>?
+        </p>
+        <p>If any users have been added to this competition their sweaty-t-shirts will also be deleted.</p>
+        <p>Click "Yes" to proceed with the delete, otherwise click "Cancel"</p>
+        <input type="button" id="deleteCompetitionButton" value="Yes" />
+        <input type="button" onclick="$.colorbox.close();" value="Cancel" />
+    </div>
+</div>
+
+<h2>Competitions I Created</h2>
+<p>@Html.ActionLink("Create New Competition", "EditCompetition", new { competitionID = 0 }, new { @class = "edit-competition-popup" })</p>
+
+@if (Model.Count > 0)
+{
+    var grid = new WebGrid(Model, canPage: false, canSort: false);
+    @grid.GetHtml(tableStyle: "webgrid",
+        rowStyle: "webgrid-row",
+        alternatingRowStyle: "webgrid-alternating-row",
+        columns: grid.Columns(
+            grid.Column(columnName: "Name", header: "Name"),
+                grid.Column(header: string.Empty, format: item => Html.ActionLink("Edit", "EditCompetition", new { competitionID = item.CompetitionID }, new { @class = "edit-competition-popup" })),
+            grid.Column(header: string.Empty, format: item => Html.ActionLink(item.IsActive ? "Deactivate" : "Activate",
+                "ToggleCompetition",
+                new { competitionID = item.CompetitionID })),
+            grid.Column(header: string.Empty, format: item => Html.ActionLink("Delete", "DeleteCompetition", new { competitionID = item.CompetitionID }, new { @class = "delete-competition-warning", @competitionName = item.Name }))
+    ))
+}

@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+    <head>
+        @Styles.Render("~/Content/css")
+        @Styles.Render("~/Content/themes/base/css")
+        @Scripts.Render("~/bundles/modernizr")
+    </head>
+    <body>
+        @if (ViewBag.Purr != null)
+        {
+            <div id="purr" class="ui-helper-hidden">
+                @{Html.RenderPartial("_Purr", ViewBag.Purr as Sweaty_T_Shirt.Models.Purr); }
+            </div>
+        }
+        <div id="body">
+            <section class="content-wrapper main-content clear-fix">
+                @RenderBody()
+            </section>
+        </div>
+        @Scripts.Render("~/bundles/jquery")
+        @Scripts.Render("~/bundles/jqueryui")
+        @RenderSection("scripts", required: false)
+                @if (ViewBag.Purr != null)
+        {
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $('#overlay').hide();
+                    $('#processing').hide();
+                    $('#purr').purr({ usingTransparentPNG: true });
+                });
+            </script>
+        }
+        else
+        {
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $('#overlay').hide();
+                    $('#processing').hide();
+                });
+            </script>
+        }
+        <!-- Overlay and processing -->
+        <div class="overlay" id="overlay"></div>
+        <div class="processing" id="processing">
+            <img src="@Url.Content("~/Images/ajax-loader.gif")" alt="Saving changes..."/>
+        </div>
+    </body>
+</html>
+

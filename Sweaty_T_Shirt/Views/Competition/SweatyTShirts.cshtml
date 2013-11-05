@@ -1,0 +1,38 @@
+﻿@model List<Sweaty_T_Shirt.Models.SweatyTShirt>
+@{
+    Layout = "~/Views/Shared/_LayoutIFrame.cshtml";
+    ViewBag.Title = "Edit Sweaty T Shirts";
+    string competitionName = Model.Count > 0 ? Model.FirstOrDefault().Competition.Name : null;
+}
+
+@section scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+<h2>@competitionName Sweaty-T-Shirts</h2>
+<input type="button" onclick="parent.$.colorbox.close();" value="Close" />
+
+    <fieldset>
+        <legend>Edit Sweaty-T-Shirts</legend>
+
+        @if (Model.Count > 0)
+        {
+            var grid = new WebGrid(Model, canPage: false, canSort: false);
+            @grid.GetHtml(tableStyle: "webgrid",
+                rowStyle: "webgrid-row",
+                alternatingRowStyle: "webgrid-alternating-row",
+                columns: grid.Columns(
+                    grid.Column(columnName: "Description", header: "Description"),
+                    grid.Column(columnName: "Amount", header: "Amount"),
+                    grid.Column(columnName: "CreatedDate", header: "Date Submitted", format: item => string.Format("{0:d}", item.CreatedDate)),
+                    grid.Column(header: string.Empty, 
+                        format: item => Html.ActionLink("Delete", "DeleteSweatyTShirt", 
+                        new { sweatyTShirtID = item.SweatyTShirtID, competitionID = item.CompetitionID }))
+            ))
+        }
+        else
+        {
+            <p>You do not have any Sweaty-T-Shirts in this competition.</p>
+        }
+    </fieldset>
+

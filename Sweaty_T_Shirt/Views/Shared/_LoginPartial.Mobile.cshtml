@@ -1,0 +1,19 @@
+﻿@using Sweaty_T_Shirt.DAL;
+@{
+    var userProfile = new AccountRepository().GetUserProfile(User.Identity.Name);
+}
+@if (Request.IsAuthenticated) {
+    <text>
+        Hello, @userProfile.FullName!
+        @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" })) {
+            @Html.AntiForgeryToken()
+            <a href="javascript:document.getElementById('logoutForm').submit()">Log off</a>
+        }        
+    </text>
+}
+else
+{
+    <ul>
+        <li>@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
+    </ul>
+}

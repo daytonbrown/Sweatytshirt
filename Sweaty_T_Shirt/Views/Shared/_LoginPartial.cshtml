@@ -1,0 +1,32 @@
+﻿@using Sweaty_T_Shirt.DAL;
+@{
+    var userProfile = new AccountRepository().GetUserProfile(User.Identity.Name);
+    string pictureUrl = FacebookRepository.GetFacebookPictureUrl();
+}
+@if (Request.IsAuthenticated) {
+    <text>
+        Hello, @Html.ActionLink(userProfile.FullName, "Manage", "Account", routeValues: null, htmlAttributes: new { @class = "username", title = "Manage" })!
+        @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" })) {
+            @Html.AntiForgeryToken()
+            <a href="javascript:document.getElementById('logoutForm').submit()">Log off</a>
+            if (!string.IsNullOrEmpty(pictureUrl))
+            {
+               <img style="width:45px;height:45px" src="@pictureUrl" alt="Facebook Picture" />
+            }
+            else
+            {
+                <a class="facebook-link" href="@Url.Action("ExternalLoginGet", "Account", new { Provider = "Facebook", ReturnUrl = Request.Url.AbsoluteUri })">
+                    <img src='@Url.Content("~/Images/small_facebook.jpg")' alt="Login to Facebook" />
+                </a>
+            }
+        }
+        
+    </text>
+}
+else
+{
+    <ul>
+        <li>@Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>
+        <li>@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
+    </ul>
+}

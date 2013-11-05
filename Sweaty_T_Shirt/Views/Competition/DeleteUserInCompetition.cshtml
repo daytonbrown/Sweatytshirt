@@ -1,0 +1,29 @@
+﻿@model Sweaty_T_Shirt.Models.UserInCompetition
+@{
+    ViewBag.Title = "Delete User From Competition?";
+    Layout = "~/Views/Shared/_LayoutIFrame.cshtml";
+}
+@section scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#cancel').click(function () {
+                parent.$.colorbox.close();
+            });
+        });
+    </script>
+}
+
+<h2>Delete User From Competition?</h2>
+
+@using (Html.BeginForm("DeleteUserInCompetition", "Competition", FormMethod.Post))
+{
+    @Html.HiddenFor(m => m.CompetitionID)
+    @Html.HiddenFor(m => m.UserID)
+
+    <p>Delete user @Model.UserProfile.FullName from the @Model.Competition.Name competition?</p>
+    <p>Click "Yes" to complete the deletion or click "Cancel" to cancel this action.</p>
+    <div>
+        <button id="submit" type="submit" value="Submit">Yes</button>
+        <button id="cancel" type="button" value="Cancel">Cancel</button>
+    </div>
+}

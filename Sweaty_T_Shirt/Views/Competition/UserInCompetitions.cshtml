@@ -1,0 +1,62 @@
+﻿@model List<Sweaty_T_Shirt.Models.UserInCompetition>
+@{
+    ViewBag.Title = "Competitions I Am In";
+}
+
+@section scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            //warning popup posts back a form to the delete method.
+            $('a.delete-userincompetition-warning').on('click', function () {
+                $('#CompetitionID').val($(this).attr('competitionID'));
+                $('#UserID').val($(this).attr('userID'));
+                $('#CompetitionName').text($(this).attr('competitionName'));
+                $.colorbox({ inline: true, href: '#deleteUserInCompetitionAlert', open: true, width: '350px', height: "350px" });
+                return false;
+            });
+
+            /*this re-wires the "Edit" link to do a colorbox popup instead of posting back to server.*/
+            $('a.edit-sweatytshirts-popup').on('click', function () {
+                $.colorbox({ href: $(this).attr('href'), open: true, iframe: true, scrolling: true, width: '700px', height: "700px" });
+                return false;
+            });
+
+        });
+    </script>
+}
+    <div style="display:none">
+        <div id="deleteUserInCompetitionAlert">
+        @using (Html.BeginForm("DeleteUserInCompetition", "Competition", FormMethod.Post))
+        {
+        <input type="hidden" name="UserID" id="UserID" />
+        <input type="hidden" name="CompetitionID" id="CompetitionID" />
+        <input type="hidden" name="RedirectToAction" id="RedirectToAction" value="UserInCompetitions" />
+            <p>
+                Delete yourself from competition <span id="CompetitionName"></span>?
+            </p>
+            <p>Click "Yes" to proceed with the delete, otherwise click "Cancel"</p>
+            <input type="submit" id="submit" value="Yes" />
+            <input type="button" onclick="$.colorbox.close();" value="Cancel" />
+        }
+        </div>
+    </div>
+
+<h2>Competitions I Am In</h2>
+
+@if (Model.Count > 0)
+{
+    var grid = new WebGrid(Model, canPage: false, canSort: false);
+    @grid.GetHtml(tableStyle: "webgrid",
+        rowStyle: "webgrid-row",
+        alternatingRowStyle: "webgrid-alternating-row",
+        columns: grid.Columns(
+        grid.Column(header: "Competition", format: item => item.Competition.Name),
+                grid.Column(header: string.Empty, format: item => Html.ActionLink("See Sweaty-T-Shirts", "SweatyTShirts", new { competitionID = item.CompetitionID, }, new { @class = "edit-sweatytshirts-popup" })),
+            grid.Column(header: string.Empty, format: item => Html.ActionLink(item.IsActive ? "Deactivate" : "Activate",
+                "ToggleUserInCompetition",
+                    new { competitionID = item.CompetitionID, userID = item.UserID, redirectToAction = "UserInCompetitions" })),
+            grid.Column(header: string.Empty, format: item => Html.ActionLink("Delete", "DeleteUserInCompetition", "Competition",
+                    new { },
+                    new { @class = "delete-userincompetition-warning", @competitionID = item.CompetitionID, @userID = item.UserID, @competitionName = item.Competition.Name }))
+    ))
+}

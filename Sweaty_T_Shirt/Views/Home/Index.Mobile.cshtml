@@ -1,0 +1,147 @@
+﻿@model Sweaty_T_Shirt.Models.SweatyTShirt
+@using Sweaty_T_Shirt.Models;
+@{
+    ViewBag.Title = "Home Page";
+    bool isFacebookAuthenticated = Sweaty_T_Shirt.DAL.FacebookRepository.IsFacebookAuthenticated();
+}
+@section scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript">
+        $(document).ready(function () {
+            /* set input max length to match the attribute */
+            $('input[data-val-length-max]').each(function () {
+                $(this).attr('maxlength', $(this).attr('data-val-length-max'));
+            });
+
+            //causes form to post back when user changes competition
+            //rules('remove') prevents client validation
+            //IsSave false tells controller this is a drop-down postback, not a save.
+            $('#CompetitionID').on('change', function () {
+                $('#Description').rules('remove');
+                $('#Amount').rules('remove');
+                $('#IsSave').val('false');
+                $(this).closest('form').submit();
+            });
+
+            //IsSave true tells controller this is a save, not a drop-down postback
+            $('#Save').on('click', function () {
+                $('#IsSave').val('true');
+                $('#overlay').show();
+                $('#processing').show();
+                window.setTimeout(function () {
+                    if ($('#frmHome').valid()) {
+                        $('#frmHome').submit();
+                    }
+                    else {
+                        $('#overlay').hide();
+                        $('#processing').hide();
+                    } 
+                }, 1);
+            });
+
+            //tint the selected sweaty t-shirt(s)
+            $('.amount-link').on('click', function () {
+                var amount = $(this).attr('id').replace('Amount', '');
+                var amountInt = parseInt(amount);
+
+                //set the hidden input and validate.
+                $('#Amount').val(amount);
+                $("form").validate().form();
+
+                $('#AmountLabel').text('Submit' + amount);
+
+                if (amount == 1) {
+                    $('#AmountLabel').text('Submit 1 Sweaty T-Shirt to the selected competition.');
+                }
+                else {
+                    $('#AmountLabel').text('Submit ' + amount + ' Sweaty T-Shirts to the selected competition.');
+                }
+
+
+                $('#Amount1').addClass('tint');
+                if (amountInt >= 2)
+                    $('#Amount2').addClass('tint');
+                else
+                    $('#Amount2').removeClass('tint');
+
+                if (amountInt >= 3)
+                    $('#Amount3').addClass('tint');
+                else
+                    $('#Amount3').removeClass('tint');
+                return false;
+            });
+        });
+    </script>
+}
+<style type="text/css">
+
+.tint {  
+    position: relative;  
+    float: left;  
+    cursor: pointer;  
+}  
+  
+.tint:before {  
+    content: "";  
+    display: block;  
+    position: absolute;  
+    top: 0;  
+    bottom: 0;  
+    left: 0;  
+    right: 0;  
+    background: rgba(0,255,255, 0.5);  
+    -moz-transition: background .3s linear;  
+    -webkit-transition: background .3s linear;  
+    -ms-transition: background .3s linear;  
+    -o-transition: background .3s linear;  
+    transition: background .3s linear;  
+}  
+</style>
+
+@using (Html.BeginForm("Index", "Home", FormMethod.Post, new { @id = "frmHome" }))
+{
+    @Html.HiddenFor(o => o.IsSave);
+                                  
+    <div style="position:absolute; top:-9999px; left:-9999px">
+    @Html.EditorFor(m => m.Amount)
+    </div>
+    
+    <div>
+	    <span style="color: #e80c4d;">@Html.ValidationSummary(false, "")</span>
+	</div>
+    
+                                  if (Model.Competitions == null || Model.Competitions.Count == 0)
+                                  { 
+        <div>You are not enrolled in any Competitions.  You cannot submit a Sweaty T Shirt unless you are enrolled in one or more Competitions.</div>
+                                  }
+                                  else
+                                  {
+        <h2>Select a Competition</h2>
+        <p>
+            @Html.DropDownListFor(m => m.CompetitionID, new SelectList(Model.Competitions, "CompetitionID", "Name"), new { @style = "display:inline" })
+        </p>
+
+        <h3><span id="AmountLabel">Submit Sweaty T-Shirt(s).</span></h3>
+        <table style="border-collapse:collapse">
+            <tr>
+                <td><a id="Amount1" class="amount-link"><img src="~/Images/small_sweaty_tshirt.jpg"></a></td>
+                <td><a id="Amount2" class="amount-link"><img src="~/Images/small_sweaty_tshirt.jpg"></a></td>
+                <td><a id="Amount3" class="amount-link"><img src="~/Images/small_sweaty_tshirt.jpg"></a></td>
+            </tr>
+        </table>
+        <div>
+            @Html.LabelFor(m => m.Description, new { @style = "display:inline" }):&nbsp;@Html.TextBoxFor(m => m.Description, new { @style = "display:inline" })
+            <br />@Html.LabelFor(m => m.SendEmail, new { @style = "display:inline" }) &nbsp;@Html.EditorFor(m => m.SendEmail, new { @style = "display:inline" })
+            @if(isFacebookAuthenticated)
+            {
+                <text>
+                <br />@Html.LabelFor(m => m.PostToFacebook, new { @style = "display:inline" }) &nbsp;@Html.EditorFor(m => m.PostToFacebook, new { @style = "display:inline" })
+                </text>
+            }
+        </div>
+        <div>
+            <input type="button" id="Save" value="Submit"/>
+        </div>
+    }
+}
+

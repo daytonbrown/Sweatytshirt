@@ -1,0 +1,25 @@
+﻿@model Sweaty_T_Shirt.Models.LocalPasswordModel
+@using Sweaty_T_Shirt.DAL;
+@{
+    var userProfile = new AccountRepository().GetUserProfile(User.Identity.Name);
+    ViewBag.Title = "Manage Account";
+}
+
+<hgroup class="title">
+    <h1>@ViewBag.Title.</h1>
+</hgroup>
+
+<p class="message-success">@ViewBag.StatusMessage</p>
+
+<p>You're logged in as <strong>@userProfile.FullName (@userProfile.Email)</strong>.</p>
+
+<section id="externalLogins">
+    @Html.Action("RemoveExternalLogins")
+
+    <h3>Add an external login</h3>
+    @Html.Action("ExternalLoginsList", new { ReturnUrl = ViewBag.ReturnUrl })
+</section>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

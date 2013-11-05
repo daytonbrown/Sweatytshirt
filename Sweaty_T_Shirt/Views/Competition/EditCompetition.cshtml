@@ -1,0 +1,123 @@
+﻿@model Sweaty_T_Shirt.Models.Competition
+@{
+    Layout = "~/Views/Shared/_LayoutIFrame.cshtml";
+    ViewBag.Title = "Edit Competition";
+    var goal = (Model.Points.HasValue? Model.Points.Value : Model.MaxPoints);
+}
+
+@section scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#Cancel').click(function () {
+                parent.$.colorbox.close();
+            });
+
+            //sets up the progress bars on partial view.
+            $('.progressbar').each(function () {
+                //does not work unless use parseInt
+                var goal = parseInt(@goal);
+                var value = parseInt($(this).prev().val());
+                $(this).progressbar({ max: goal, value: value })
+                .children('.ui-progressbar-value')
+                .html(value)
+                .css('display','block');
+            });
+
+            //this rewires the "Delete" link to confirm deletion in popup.  
+            $('.delete-userincompetition-warning').on('click', function () {
+                $('#UserFullName').text($(this).attr('userFullName'));
+                var href = $(this).attr('href');
+                $('#deleteUserInCompetition').on('click', function () {
+                    document.location.href = href;
+                });
+                $.colorbox({ inline: true, href: '#deleteUserInCompetitionAlert', open: true, width: '350px', height: "350px" });
+                return false;
+            });
+
+            //this rewires the "Add.." link to add a user to a competition in a colorbox popup.
+            $('a.add-userincompetition-popup').on('click', function () {
+                $.colorbox({ href: $(this).attr('href'), open: true, iframe: true, scrolling: false, width: '500px', height: "500px" });
+                return false;
+            });
+
+            //TODO move webgrid to a partial view and reload it via JSON call when user is deleted or deactivated.
+        });
+    </script>
+}
+
+<div style="display:none">
+    <div id="deleteUserInCompetitionAlert">
+        <p>Delete user <span id="UserFullName"></span> from the @Model.Name competition?</p>
+        <p>Click "Yes" to complete the deletion or click "Cancel" to cancel this action.</p>
+        <div>
+            <button id="deleteUserInCompetition" value="Yes">Yes</button>
+            <input type="button" onclick="$.colorbox.close();" value="Cancel" />
+        </div>
+   </div>
+</div>
+
+<h2>Edit Competition</h2>
+
+@using (Html.BeginForm("EditCompetition", "Competition", FormMethod.Post))
+{
+    @Html.HiddenFor(m => m.CompetitionID)
+    <div>
+	    <span class="message-error">@Html.ValidationSummary(false, "Please correct the following.")</span>
+	</div>
+    
+    <table>
+	    <tr>
+		    <td><button id="Save" type="submit" value="Save">Save</button></td>
+            <td><button id="Cancel" type="button" value="Cancel">Close</button></td>
+	    </tr>
+    </table>
+    
+    <table>
+        <tr>
+            <td>@Html.LabelFor(m => m.Name)</td>
+            <td>@Html.EditorFor(m => m.Name)</td>
+        </tr>
+        <tr>
+            <td>@Html.LabelFor(m => m.Description)</td>
+            <td>@Html.EditorFor(m => m.Description)</td>
+        </tr>
+        <tr>
+            <td>@Html.LabelFor(m => m.Points)</td>
+            <td>@Html.EditorFor(m => m.Points)</td>
+        </tr>
+        <tr>
+            <td>@Html.LabelFor(m => m.EndDate)</td>
+            <td>@Html.EditorFor(m => m.EndDate)</td>
+        </tr>
+        <tr>
+            <td>@Html.LabelFor(m => m.IsActive)</td>
+            <td>@Html.EditorFor(m => m.IsActive)</td>
+        </tr>
+    </table>
+}
+@if (Model.CompetitionID > 0)
+{
+    <fieldset>
+        <legend>Users</legend>
+        <p>@Html.ActionLink("Add User To Competition", "AddUserInCompetition", new { competitionID = Model.CompetitionID }, new { @class = "add-userincompetition-popup" })</p>
+        @if (Model.UserInCompetitions != null && Model.UserInCompetitions.Count > 0)
+        {
+            var grid = new WebGrid(Model.UserInCompetitions, canPage: false, canSort: false);
+            @grid.GetHtml(tableStyle: "webgrid",
+                rowStyle: "webgrid-row",
+                alternatingRowStyle: "webgrid-alternating-row",
+                columns: grid.Columns(
+                            grid.Column(columnName: "UserProfile.FullName", header: "User Name"),
+                            grid.Column(header: string.Empty, format: item => Html.ActionLink(item.IsActive ? "Deactivate" : "Activate",
+                                    "ToggleUserInCompetition",
+                                    new { competitionID = item.CompetitionID, userID = item.UserID, redirectToAction = "EditCompetition" })),
+                                          grid.Column(header: string.Empty, format: item => Html.ActionLink("Delete", "DeleteUserInCompetition", new { competitionID = item.CompetitionID, userID = item.UserID, redirectToAction = "EditCompetition" }, new { @class = "delete-userincompetition-warning", @userFullName = item.UserProfile.FullName }))
+            ))
+        }
+    </fieldset>
+    if (Model.CompetitionProgressBars != null && Model.CompetitionProgressBars.Count > 0)
+    {
+        Html.RenderPartial("_CompetitionProgressBars", Model);
+    }
+}

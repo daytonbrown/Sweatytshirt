@@ -1,0 +1,15 @@
+@model Sweaty_T_Shirt.Models.UserInCompetition
+@using System.Net.Mail;
+@using Mvc.Mailer;
+<p>
+    Dear @Model.FullName,
+</p>
+<p>
+    You have been added to the @Model.Competition.Name competition by @Model.Competition.UserProfile.FullName .
+</p>
+<p>
+    Sincerely,
+</p>
+<p>
+    <a href="@Url.Abs(Url.Action("Index", "Home"))">Sweaty T-Shirt.com</a>.
+</p>

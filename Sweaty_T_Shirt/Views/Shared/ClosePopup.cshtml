@@ -1,0 +1,23 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutIFrame.cshtml";
+}
+
+@section scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            //Close the popup that did the submit.
+            if (parent.$.colorbox != null)
+                parent.$.colorbox.close();
+
+            //reload the parent of the popup OR change the location of the parent of the popup
+            @{if (ViewBag.Location != null) {
+                    <text>parent.location='@ViewBag.Location';</text> 
+                }
+                else{
+                      <text>parent.location.reload();</text>
+                }
+            }
+        });
+    </script>
+}
+

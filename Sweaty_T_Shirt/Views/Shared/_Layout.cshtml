@@ -1,0 +1,95 @@
+﻿@{
+    var isAdmin = User.IsInRole(Sweaty_T_Shirt.DAL.AccountRepository.AdminRole);
+}
+}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>@ViewBag.Title - Sweaty T-Shirt</title>
+        <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+        <meta name="viewport" content="width=device-width" />
+        @Styles.Render("~/Content/css")
+        @Styles.Render("~/Content/themes/base/css")
+        @Scripts.Render("~/bundles/modernizr")
+    </head>
+    <body>
+        @if (ViewBag.Purr != null)
+        {
+            <div id="purr" class="ui-helper-hidden">
+                @{Html.RenderPartial("_Purr", ViewBag.Purr as Sweaty_T_Shirt.Models.Purr); }
+                @{/* Html.RenderPartial("_Purr", new Sweaty_T_Shirt.Models.Purr() { Title = ViewBag.Purr.Title, Message = ViewBag.Purr.Message }); */}
+            </div>
+        }
+        <header>
+            <div class="content-wrapper">
+                <div class="float-left">
+                    <p class="site-title">@Html.ActionLink("Home", "Index", "Home")</p>
+                </div>
+                <div class="float-right">
+                    <section id="login">
+                        @Html.Partial("_LoginPartial")
+                    </section>
+                    <nav>
+                        <ul id="menu">
+                            <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                            <li>@Html.ActionLink("About", "About", "Home")</li>
+                            <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                            @if (Request.IsAuthenticated)
+                            {
+                                <li>@Html.ActionLink("Competitions I Am In", "UserInCompetitions", "Competition")</li>
+                                <li>@Html.ActionLink("Competitions I Created", "Index", "Competition")</li>
+                                if (isAdmin)
+                                {
+                                    <li>@Html.ActionLink("Manage Users", "ManageUsers", "Account")</li>
+                                }
+                            }
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </header>
+        <div id="body">
+            @RenderSection("featured", required: false)
+            <section class="content-wrapper main-content clear-fix">
+                @RenderBody()
+            </section>
+        </div>
+        <footer>
+            <div class="content-wrapper">
+                <div class="float-left">
+                    <p>&copy; @DateTime.Now.Year - Sweaty T-Shirt</p>
+                </div>
+            </div>
+        </footer>
+
+        @Scripts.Render("~/bundles/jquery")
+        @Scripts.Render("~/bundles/jqueryui")
+        @RenderSection("scripts", required: false)
+        @if (ViewBag.Purr != null)
+        {
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $('#overlay').hide();
+                    $('#processing').hide();
+                    $('#purr').purr({ usingTransparentPNG: true });
+                });
+            </script>
+        }
+        else
+        {
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $('#overlay').hide();
+                    $('#processing').hide();
+                });
+            </script>
+        }
+        
+        <!-- Overlay and processing -->
+        <div class="overlay" id="overlay"></div>
+        <div class="processing" id="processing">
+            <img src="@Url.Content("~/Images/ajax-loader.gif")" alt="Saving changes..."/>
+        </div>
+    </body>
+</html>
