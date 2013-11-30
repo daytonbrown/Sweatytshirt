@@ -24,6 +24,12 @@
                 .css('display','block');
             });
 
+            /*this re-wires the cpb name link to do a colorbox popup instead of posting back to server.*/
+            $('a.progressbar-link').on('click', function () {
+                $.colorbox({ href: $(this).attr('href'), open: true, iframe: true, scrolling: true, width: '700px', height: "700px" });
+                return false;
+            });
+
             //this rewires the "Delete" link to confirm deletion in popup.  
             $('.delete-userincompetition-warning').on('click', function () {
                 $('#UserFullName').text($(this).attr('userFullName'));

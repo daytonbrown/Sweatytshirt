@@ -1,6 +1,5 @@
 ﻿@{
-    var isAdmin = User.IsInRole(Sweaty_T_Shirt.DAL.AccountRepository.AdminRole);
-}
+    bool isAdmin = (bool)HttpContext.Current.Items[Sweaty_T_Shirt.Controllers.ControllerHelpers.ISADMIN];
 }
 <!DOCTYPE html>
 <html lang="en">

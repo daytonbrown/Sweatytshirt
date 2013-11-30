@@ -18,7 +18,7 @@ namespace Sweaty_T_Shirt.Controllers
     //instead of InitializeSimpleMembership attribute, moved initialization
     //to Application_Start, which calls DAL\SweatyTShirtInitializer.cs Seed()
     //[InitializeSimpleMembership]
-    public class AccountController : Controller
+    public class AccountController : BaseController
     {
         [Authorize(Roles=AccountRepository.AdminRole)]
         public ActionResult ManageUsers()

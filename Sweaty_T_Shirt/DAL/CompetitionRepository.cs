@@ -61,7 +61,7 @@ namespace Sweaty_T_Shirt.DAL
             if (competitionID.HasValue)
             {
                 return _context.SweatyTShirts.Where(o => o.UserID == userID && o.CompetitionID == competitionID.Value)
-                    .Include(o => o.Competition).ToList();
+                    .Include(o => o.Competition).Include(o => o.UserProfile).ToList();
             }
             else
             {

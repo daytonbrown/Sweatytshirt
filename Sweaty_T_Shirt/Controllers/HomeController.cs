@@ -11,7 +11,7 @@ using Mvc.Mailer;
 namespace Sweaty_T_Shirt.Controllers
 {
     [Authorize]
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         public ActionResult Index(SweatyTShirt sweatyTShirt)
         {

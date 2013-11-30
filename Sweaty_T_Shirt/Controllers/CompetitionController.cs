@@ -11,7 +11,7 @@ using Sweaty_T_Shirt.DAL;
 namespace Sweaty_T_Shirt.Controllers
 {
     [Authorize]
-    public class CompetitionController : Controller
+    public class CompetitionController : BaseController
     {
         [HttpGet]
         public ActionResult Index()
@@ -346,8 +346,49 @@ namespace Sweaty_T_Shirt.Controllers
             return View(list);
         }
 
+        public ActionResult SweatyTShirtsCPB(int userID, long competitionID)
+        {
+            if (userID <= 0)
+            {
+                throw new ApplicationException("Missing argument UserID");
+            }
+
+            bool isAbleToDelete = (bool)System.Web.HttpContext.Current.Items[Sweaty_T_Shirt.Controllers.ControllerHelpers.ISADMIN];
+
+            if (!isAbleToDelete)
+            {
+                int currentUserID = WebSecurity.GetUserId(User.Identity.Name);
+                if (currentUserID < 0)
+                {
+                    throw new ApplicationException(string.Format("Unable to retrieve UserID for '{0}'", User.Identity.Name));
+                }
+                isAbleToDelete = (userID == currentUserID);
+            }
+
+            ViewBag.IsAbleToDelete = isAbleToDelete;
+
+            List<SweatyTShirt> list = null;
+            using (CompetitionRepository competitionRepository = new CompetitionRepository())
+            {
+                list = competitionRepository.GetSweatyTShirtsForUser(userID, competitionID)
+                    .OrderByDescending(o => o.CreatedDate)
+                    .ToList();
+            }
+
+            //if DeleteSweatyTShirt redirected to here show the purr message
+            if (TempData[ControllerHelpers.PURR] != null)
+            {
+                ViewBag.Purr = TempData[ControllerHelpers.PURR];
+                TempData[ControllerHelpers.PURR] = null;
+            }
+
+            return View("SweatyTShirts", list);
+        }
+
         public ActionResult SweatyTShirts(long competitionID)
         {
+            ViewBag.IsAbleToDelete = true;
+
             int userID = WebSecurity.GetUserId(User.Identity.Name);
             if (userID < 0)
             {

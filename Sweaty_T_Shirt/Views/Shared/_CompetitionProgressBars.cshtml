@@ -24,7 +24,13 @@
         @foreach (CompetitionProgressBar cpb in Model.CompetitionProgressBars)
         {
             <tr>
-                <td style="width:24%">@cpb.FullName</td>
+                <td style="width:24%">
+                    @Html.ActionLink(cpb.FullName,
+                 "SweatyTShirtsCPB",
+                    "Competition",
+                 new { userID = cpb.UserID, competitionID = Model.CompetitionID },
+                 new {@class="progressbar-link" });
+                </td>
                 <td style="width:75%"><input type="hidden" class="amount" value="@cpb.Amount" /><div class="progressbar"></div></td>
             </tr>
         }
