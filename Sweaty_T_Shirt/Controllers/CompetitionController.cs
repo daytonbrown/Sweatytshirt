@@ -10,7 +10,7 @@ using Sweaty_T_Shirt.DAL;
 
 namespace Sweaty_T_Shirt.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = AccountRepository.UserOrAdminRole)]
     public class CompetitionController : BaseController
     {
         [HttpGet]

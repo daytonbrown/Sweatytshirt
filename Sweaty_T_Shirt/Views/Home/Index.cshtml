@@ -16,7 +16,13 @@
             /* set input max length to match the attribute */
             $('input[data-val-length-max]').each(function () {
                  $(this).attr('maxlength', $(this).attr('data-val-length-max'));
-             });
+            });
+
+            /*this re-wires the competition link to do a colorbox popup instead of posting back to server.*/
+            $('a.edit-competition-popup').on('click', function () {
+                $.colorbox({ href: $(this).attr('href'), open: true, iframe: true, scrolling: true, width: '700px', height: "700px" });
+                return false;
+            });
 
             //causes form to post back when user changes competition
             //rules('remove') prevents client validation
@@ -207,7 +213,7 @@
                     @class = "userincompetition-warning", 
                     @competitionName = Model.Competition.Name
                 })
-            <span> From This Competition</span>
+            <span> From </span>@Html.ActionLink(Model.Competition.Name, "EditCompetition", "Competition", new { competitionID = Model.CompetitionID }, new { @class = "edit-competition-popup" })
         </p>
 
         <h3><span id="AmountLabel">Submit Sweaty T-Shirt(s) to the selected competition.</span></h3>
@@ -220,7 +226,6 @@
         </table>
         <div>
             @Html.LabelFor(m => m.Description, new { @style = "display:inline" }):&nbsp;@Html.TextBoxFor(m => m.Description, new { @style = "display:inline" })
-            &nbsp;&nbsp;@Html.LabelFor(m => m.SendEmail, new { @style = "display:inline" }) &nbsp;@Html.EditorFor(m => m.SendEmail, new { @style = "display:inline" })
             @if(isFacebookAuthenticated)
             {
                 <text>

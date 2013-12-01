@@ -10,7 +10,7 @@ using Mvc.Mailer;
 
 namespace Sweaty_T_Shirt.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = AccountRepository.UserOrAdminRole)]
     public class HomeController : BaseController
     {
         public ActionResult Index(SweatyTShirt sweatyTShirt)
@@ -24,6 +24,7 @@ namespace Sweaty_T_Shirt.Controllers
                 if (sweatyTShirt.IsSave)
                 {
                     sweatyTShirt.CreatedDate = DateTime.Now;
+                    sweatyTShirt.SendEmail = true;  //per Dayton
                     competitionRepository.AddSweatyTShirt(sweatyTShirt);
                     ViewBag.Purr = new Purr() { Title = "Success", Message = "Sweaty-T-Shirt was successfully added." };
                 }
@@ -76,6 +77,12 @@ namespace Sweaty_T_Shirt.Controllers
                         }
                     }
                 }
+            }
+
+            if (TempData[ControllerHelpers.PURR] != null)
+            {
+                ViewBag.Purr = TempData[ControllerHelpers.PURR];
+                TempData[ControllerHelpers.PURR] = null;
             }
 
             sweatyTShirt.IsSave = false;

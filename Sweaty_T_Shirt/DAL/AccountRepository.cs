@@ -20,6 +20,7 @@ namespace Sweaty_T_Shirt.DAL
 
         public const string AdminRole = "Admin";
         public const string UserRole = "User";
+        public const string UserOrAdminRole = "User,Admin";
 
         private const string DeleteUserSqlCommand = @"DELETE FROM dbo.UserInCompetition WHERE UserID = {0};"
             + "DELETE FROM dbo.SweatyTShirt WHERE UserID = {0};"
