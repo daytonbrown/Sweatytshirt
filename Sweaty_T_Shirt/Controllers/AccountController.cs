@@ -45,7 +45,7 @@ namespace Sweaty_T_Shirt.Controllers
         public ActionResult DeleteUser(int userId)
         {
             //int userId = int.Parse(formCollection["UserId"]);
-            int adminUserID = WebSecurity.GetUserId(User.Identity.Name);
+            int adminUserID = UserID;
             using (var accountRepository = new AccountRepository())
             {
                 accountRepository.DeleteUser(userId, adminUserID);
@@ -245,7 +245,7 @@ namespace Sweaty_T_Shirt.Controllers
                 // Use a transaction to prevent the user from deleting their last login credential
                 using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.Serializable }))
                 {
-                    bool hasLocalAccount = OAuthWebSecurity.HasLocalAccount(WebSecurity.GetUserId(User.Identity.Name));
+                    bool hasLocalAccount = OAuthWebSecurity.HasLocalAccount(UserID);
                     if (hasLocalAccount || OAuthWebSecurity.GetAccountsFromUserName(User.Identity.Name).Count > 1)
                     {
                         OAuthWebSecurity.DeleteAccount(provider, providerUserId);
@@ -268,7 +268,7 @@ namespace Sweaty_T_Shirt.Controllers
                 : message == ManageMessageId.SetPasswordSuccess ? "Your password has been set."
                 : message == ManageMessageId.RemoveLoginSuccess ? "The external login was removed."
                 : "";
-            ViewBag.HasLocalPassword = OAuthWebSecurity.HasLocalAccount(WebSecurity.GetUserId(User.Identity.Name));
+            ViewBag.HasLocalPassword = OAuthWebSecurity.HasLocalAccount(UserID);
             ViewBag.ReturnUrl = Url.Action("Manage");
             return View();
         }
@@ -280,7 +280,7 @@ namespace Sweaty_T_Shirt.Controllers
         //[ValidateAntiForgeryToken]
         public ActionResult Manage(LocalPasswordModel model)
         {
-            bool hasLocalAccount = OAuthWebSecurity.HasLocalAccount(WebSecurity.GetUserId(User.Identity.Name));
+            bool hasLocalAccount = OAuthWebSecurity.HasLocalAccount(UserID);
             ViewBag.HasLocalPassword = hasLocalAccount;
             ViewBag.ReturnUrl = Url.Action("Manage");
             if (hasLocalAccount)
@@ -492,7 +492,7 @@ namespace Sweaty_T_Shirt.Controllers
                 });
             }
 
-            ViewBag.ShowRemoveButton = externalLogins.Count > 1 || OAuthWebSecurity.HasLocalAccount(WebSecurity.GetUserId(User.Identity.Name));
+            ViewBag.ShowRemoveButton = externalLogins.Count > 1 || OAuthWebSecurity.HasLocalAccount(UserID);
             return PartialView("_RemoveExternalLoginsPartial", externalLogins);
         }
 

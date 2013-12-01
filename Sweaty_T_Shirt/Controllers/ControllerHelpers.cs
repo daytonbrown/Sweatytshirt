@@ -8,7 +8,6 @@ namespace Sweaty_T_Shirt.Controllers
     public class ControllerHelpers
     {
         public const string PURR = "PURR";
-        public const string ISADMIN = "ISADMIN";
 
         public static List<CompetitionProgressBar> GetCompetitionProgressBars(
             CompetitionRepository competitionRepository,

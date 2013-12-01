@@ -53,7 +53,7 @@ namespace Sweaty_T_Shirt.DAL
                         && uic.CompetitionID == competionID
                         && uic.UserID == u.UserId
                         && s.CompetitionID == competionID
-                        select s).Include(o => o.UserProfile).ToList();
+                        select s).Include(o => o.UserProfile).Include(o => o.Competition).ToList();
         }
 
         public List<SweatyTShirt> GetSweatyTShirtsForUser(int userID, long? competitionID = null)

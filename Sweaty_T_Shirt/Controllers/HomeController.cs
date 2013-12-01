@@ -15,11 +15,8 @@ namespace Sweaty_T_Shirt.Controllers
     {
         public ActionResult Index(SweatyTShirt sweatyTShirt)
         {
-            int userID = WebSecurity.GetUserId(User.Identity.Name);
-            if (userID < 0)
-            {
-                throw new ApplicationException(string.Format("Unable to retrieve UserID for '{0}'", User.Identity.Name));
-            }
+            int userID = UserID;
+
             sweatyTShirt.UserID = userID;
 
             using (CompetitionRepository competitionRepository = new CompetitionRepository())

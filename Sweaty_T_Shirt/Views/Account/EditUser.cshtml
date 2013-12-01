@@ -183,13 +183,11 @@
                     grid.Column(columnName: "Amount", header: "Amount"),
                     grid.Column(columnName: "CreatedDate", header: "Date Submitted", format: item => string.Format("{0:d}", item.CreatedDate)),
                     grid.Column(header: string.Empty,
-                     format: item => Html.ActionLink("Delete", "DeleteSweatyTShirtWithRedirect", "Competition",
+                     format: item => Html.ActionLink("Delete", "DeleteSweatyTShirtEditUser", "Competition",
                         new
                         {
                             sweatyTShirtID = item.SweatyTShirtID,
-                            userID = item.UserID,
-                            redirectToAction = "EditUser",
-                            redirectToController = "Account"
+                            userID = item.UserID
                         },
                         new { @class = "delete-sweatytshirt-warning", @description = item.Description + "(" + item.Amount + ")" }))
             ))

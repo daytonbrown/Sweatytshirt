@@ -16,14 +16,12 @@ namespace Sweaty_T_Shirt.Controllers
         [HttpGet]
         public ActionResult Index()
         {
-            int userID = WebSecurity.GetUserId(User.Identity.Name);
-            
             List<Competition> competitions = null;
             //always put CompetitionRepository inside a using block, so Dispose is called and database connection is closed.
             //failure to do that could cause serious memory leak.
             using (CompetitionRepository repository = new CompetitionRepository())
             {
-                competitions = repository.GetCompetitionsCreatedByUser(userID);
+                competitions = repository.GetCompetitionsCreatedByUser(UserID);
             }
 
             //if another method redirected to here show the purr message
@@ -93,7 +91,7 @@ namespace Sweaty_T_Shirt.Controllers
                 if (competition.CompetitionID <= 0)
                 {
                     competition.CreatedDate = DateTime.Now;
-                    competition.CreatorUserID = WebSecurity.GetUserId(User.Identity.Name);
+                    competition.CreatorUserID = UserID;
                 }
                 repository.SaveCompetition(competition);
             }
@@ -325,15 +323,10 @@ namespace Sweaty_T_Shirt.Controllers
 
         public ActionResult UserInCompetitions()
         {
-            int userID = WebSecurity.GetUserId(User.Identity.Name);
-            if (userID < 0)
-            {
-                throw new ApplicationException(string.Format("Unable to retrieve UserID for '{0}'", User.Identity.Name));
-            }
             List<UserInCompetition> list = null;
             using (CompetitionRepository competitionRepository = new CompetitionRepository())
             {
-                list = competitionRepository.GetUserInCompetitionsForUser(userID);
+                list = competitionRepository.GetUserInCompetitionsForUser(UserID);
             }
 
             //if another method redirected to here show the purr message
@@ -346,26 +339,17 @@ namespace Sweaty_T_Shirt.Controllers
             return View(list);
         }
 
-        public ActionResult SweatyTShirtsCPB(int userID, long competitionID)
+        [ActionName("SweatyTShirtsCPB")]
+        public ActionResult SweatyTShirts(int userID, long competitionID)
         {
             if (userID <= 0)
             {
                 throw new ApplicationException("Missing argument UserID");
             }
 
-            bool isAbleToDelete = (bool)System.Web.HttpContext.Current.Items[Sweaty_T_Shirt.Controllers.ControllerHelpers.ISADMIN];
-
-            if (!isAbleToDelete)
-            {
-                int currentUserID = WebSecurity.GetUserId(User.Identity.Name);
-                if (currentUserID < 0)
-                {
-                    throw new ApplicationException(string.Format("Unable to retrieve UserID for '{0}'", User.Identity.Name));
-                }
-                isAbleToDelete = (userID == currentUserID);
-            }
-
-            ViewBag.IsAbleToDelete = isAbleToDelete;
+            ViewBag.IsUserAdmin = IsUserAdmin;
+            ViewBag.UserID = UserID;
+            ViewBag.ShowUserName = false;
 
             List<SweatyTShirt> list = null;
             using (CompetitionRepository competitionRepository = new CompetitionRepository())
@@ -387,18 +371,15 @@ namespace Sweaty_T_Shirt.Controllers
 
         public ActionResult SweatyTShirts(long competitionID)
         {
-            ViewBag.IsAbleToDelete = true;
-
-            int userID = WebSecurity.GetUserId(User.Identity.Name);
-            if (userID < 0)
-            {
-                throw new ApplicationException(string.Format("Unable to retrieve UserID for '{0}'", User.Identity.Name));
-            }
+            ViewBag.IsUserAdmin = IsUserAdmin;
+            ViewBag.UserID = UserID;
+            ViewBag.ShowUserName = true;
 
             List<SweatyTShirt> list = null;
             using (CompetitionRepository competitionRepository = new CompetitionRepository())
             {
-                list = competitionRepository.GetSweatyTShirtsForUser(userID, competitionID)
+                list = competitionRepository.GetSweatyTShirtsInCompetition(competitionID)
+                    .OrderBy(o => o.UserProfile.FullName)
                     .OrderByDescending(o => o.CreatedDate)
                     .ToList();
             }
@@ -413,7 +394,7 @@ namespace Sweaty_T_Shirt.Controllers
             return View(list);
         }
 
-        public ActionResult DeleteSweatyTShirt(long sweatyTShirtID, long competitionID)
+        private void DeleteSweatyTShirt(long sweatyTShirtID)
         {
             using (CompetitionRepository competitionRepository = new CompetitionRepository())
             {
@@ -421,24 +402,33 @@ namespace Sweaty_T_Shirt.Controllers
             }
 
             TempData[ControllerHelpers.PURR] = new Purr() { Title = "Success", Message = "The Sweaty-T-Shirt was successfully deleted." };
+        }
 
+        /// <summary>
+        /// userID not needed, but shares an actionlink with CPB method.
+        /// </summary>
+        /// <param name="sweatyTShirtID"></param>
+        /// <param name="competitionID"></param>
+        /// <param name="userID"></param>
+        /// <returns></returns>
+        public ActionResult DeleteSweatyTShirt(long sweatyTShirtID, long competitionID, int userID)
+        {
+            DeleteSweatyTShirt(sweatyTShirtID);
             return RedirectToAction("SweatyTShirts", new {competitionID = competitionID});
         }
 
-        [ActionName("DeleteSweatyTShirtWithRedirect")]
-        public ActionResult DeleteSweatyTShirt(long sweatyTShirtID, 
-            int userID, 
-            string redirectToAction, 
-            string redirectToController)
+        public ActionResult DeleteSweatyTShirtCPB(long sweatyTShirtID, long competitionID, int userID)
         {
-            using (CompetitionRepository competitionRepository = new CompetitionRepository())
-            {
-                competitionRepository.DeleteSweatyTShirt(sweatyTShirtID);
-            }
+            DeleteSweatyTShirt(sweatyTShirtID);
+            return RedirectToAction("SweatyTShirtsCPB", new { userID = userID, competitionID = competitionID });
+        }
 
-            TempData[ControllerHelpers.PURR] = new Purr() { Title = "Success", Message = "The Sweaty-T-Shirt was successfully deleted." };
-
-            return RedirectToAction(redirectToAction, redirectToController, new { userID = userID });
+        [ActionName("DeleteSweatyTShirtEditUser")]
+        public ActionResult DeleteSweatyTShirt(long sweatyTShirtID, 
+            int userID)
+        {
+            DeleteSweatyTShirt(sweatyTShirtID);
+            return RedirectToAction("EditUser", "Account", new { userID = userID });
         }
     }
 }

@@ -3,28 +3,30 @@
     Layout = "~/Views/Shared/_LayoutIFrame.cshtml";
     ViewBag.Title = "Edit Sweaty T Shirts";
     string competitionName = Model.Count > 0 ? Model.FirstOrDefault().Competition.Name : null;
-    string userName = Model.FirstOrDefault().UserProfile.FullName;
-    bool isAbleToDelete = (bool)ViewBag.IsAbleToDelete;
+    int userID = ViewBag.UserID;
+    bool isUserAdmin = (bool)ViewBag.IsUserAdmin;
+    bool showUserName = (bool)ViewBag.ShowUserName;
 
     var grid = new WebGrid(Model, canPage: false, canSort: false);
     IEnumerable<WebGridColumn> columns = grid.Columns(
-                    grid.Column(columnName: "Description", header: "Description"),
-                    grid.Column(columnName: "Amount", header: "Amount"),
-                    grid.Column(columnName: "CreatedDate", header: "Date Submitted", format: item => string.Format("{0:d}", item.CreatedDate)));
-    
-    if(isAbleToDelete)
-    {
-        columns = columns.Concat(grid.Columns(grid.Column(header: string.Empty,
-                        format: item => Html.ActionLink("Delete", "DeleteSweatyTShirt",
-                        new { sweatyTShirtID = item.SweatyTShirtID, competitionID = item.CompetitionID }))));
-    }
+        grid.Column(header: (showUserName? "User" : string.Empty), format: item => (showUserName ? 
+                            item.UserProfile.FullName : new HtmlString(""))),
+        grid.Column(columnName: "Description", header: "Description"),
+        grid.Column(columnName: "Amount", header: "Amount"),
+        grid.Column(columnName: "CreatedDate", header: "Date Submitted", format: item => string.Format("{0:d}", item.CreatedDate)),
+        grid.Column(header: string.Empty,
+            format: item => (isUserAdmin || item.UserID == userID ? 
+                Html.ActionLink("Delete", (showUserName ? "DeleteSweatyTShirt" : "DeleteSweatyTShirtCPB"),
+                new { sweatyTShirtID = item.SweatyTShirtID, competitionID = item.CompetitionID, userID = item.UserID })
+                : new HtmlString(""))
+                ));
 }
 
 @section scripts {
     @Scripts.Render("~/bundles/jqueryval")
 }
 
-<h2>@userName Sweaty-T-Shirts in @competitionName</h2>
+<h2>Sweaty-T-Shirts in @competitionName</h2>
 <input type="button" onclick="parent.$.colorbox.close();" value="Close" />
 
     <fieldset>
