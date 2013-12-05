@@ -1,12 +1,13 @@
 ﻿@model Sweaty_T_Shirt.Models.SweatyTShirt
 @using Sweaty_T_Shirt.Models;
 @{
-    ViewBag.Title = "Home Page";
+    ViewBag.Title = "Sweaty T-Shirt Home";
     bool isFacebookAuthenticated = Sweaty_T_Shirt.DAL.FacebookRepository.IsFacebookAuthenticated();
     int goal = 0;
     if(Model.Competition != null)
     {
-        goal = (Model.Competition.Points.HasValue ? Model.Competition.Points.Value : Model.Competition.MaxPoints);
+        //goal = (Model.Competition.Points.Value==0 ? Model.Competition.Points.Value : Model.Competition.MaxPoints);
+        goal = Model.Competition.MaxPoints;
     }
 }
 @section scripts {

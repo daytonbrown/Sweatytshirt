@@ -67,9 +67,9 @@ namespace Sweaty_T_Shirt.Controllers
                             {
                                 using (var msg = sendMail.SweatyTShirtAdded(sweatyTShirt, cpb, true))
                                 {
-                                    msg.SendAsync(userState: sweatyTShirt.UserProfile.Email);
+                                   // msg.SendAsync( userState: sweatyTShirt.UserProfile.Email);
                                     msg.Send();
-                                    msg.Dispose();
+                                   // msg.Dispose();
                                 }
                             }
                         }
@@ -90,7 +90,7 @@ namespace Sweaty_T_Shirt.Controllers
 
         public ActionResult About()
         {
-            ViewBag.Message = "HomeController About().";
+            //ViewBag.Message = "HomeController About().";
 
             return View();
         }
