@@ -249,8 +249,8 @@ namespace Sweaty_T_Shirt.Controllers
                     using (var msg = new SendMail().UserInCompetitionAdded(userInCompetition, true))
                     {
                         //msg.SendAsync(userState: userInCompetition.Email);
-                        //msg.Send();
-                        msg.Dispose();
+                        msg.Send();
+                        //msg.Dispose();
                     }
                 }
 
