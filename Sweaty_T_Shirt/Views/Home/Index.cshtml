@@ -6,8 +6,7 @@
     int goal = 0;
     if(Model.Competition != null)
     {
-        //goal = (Model.Competition.Points.Value==0 ? Model.Competition.Points.Value : Model.Competition.MaxPoints);
-        goal = Model.Competition.MaxPoints;
+        goal = (Model.Competition.Points.HasValue ? Model.Competition.Points.Value : Model.Competition.MaxPoints);
     }
 }
 @section scripts {
