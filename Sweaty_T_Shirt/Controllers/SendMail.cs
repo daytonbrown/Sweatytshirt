@@ -92,7 +92,7 @@ namespace Sweaty_T_Shirt.Controllers
                             IsBodyHtml = true
                         };
 
-                        //smtpClient.Send(mailMessage);
+                        smtpClient.Send(mailMessage);
                         if (!distinctUserIds.Contains(sweatyTShirtEmail.RecipientUserID))
                         {
                             new AccountRepository().UpdateLastEmailSent(sweatyTShirtEmail.RecipientUserID);
