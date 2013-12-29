@@ -38,12 +38,43 @@ namespace Sweaty_T_Shirt.Models
         [StringLength(4000)]
         public string Description { get; set; }
 
+        private int _maxPoints = 0;
         /// <summary>
-        /// If Points is null or empty set this value to have maxiumum for progress bar display.
+        /// If Points is null or empty use this value to have maxiumum for progress bar display.
         /// </summary>
         [NotMapped]
         [Display(Name = "Points")]
-        public int MaxPoints { get; set; }
+        public int MaxPoints
+        {
+            get
+            {
+                if (this.CompetitionProgressBars != null)
+                {
+                    _maxPoints = CompetitionProgressBars.Max(o => o.Amount);
+                }
+                else
+                {
+                    _maxPoints = 0;
+                }
+
+                return _maxPoints;
+            }
+            set
+            {
+                //this is called by default serializer and passes 0, do not use 
+            }
+        }
+
+        public bool IsUsingDefaultImage()
+        {
+            return string.IsNullOrEmpty(ImageSrc) ? true : ImageSrc.Contains(Sweaty_T_Shirt.Controllers.ControllerHelpers.DefaultImageSrc);
+        }
+
+        [NotMapped]
+        public bool UseDefaultImage {get;set;}
+
+        [Display(Name = "Competition Icon")]
+        public string ImageSrc { get; set; }
 
         [Display(Name = "Points")]
         [Integer(ErrorMessage = "Points must be numeric.")]
@@ -52,7 +83,7 @@ namespace Sweaty_T_Shirt.Models
         [Display(Name = "End Date")]
         public DateTime? EndDate { get; set; }
 
-        [Display(Name="Competition Is Active?")]
+        [Display(Name = "Competition Is Active?")]
         public bool IsActive { get; set; }
 
         /// <summary>

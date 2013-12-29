@@ -4,7 +4,8 @@ namespace Sweaty_T_Shirt.Controllers
 {
     public interface ISendMail
     {
-        MvcMailMessage SweatyTShirtAdded(SweatyTShirt sweatyTShirt, CompetitionProgressBar competitionProgressBar, bool isAsync = false);
+        void SendEmails();
+
         MvcMailMessage UserInCompetitionAdded(UserInCompetition userInCompetition, bool isAsync = false);
     }
 }

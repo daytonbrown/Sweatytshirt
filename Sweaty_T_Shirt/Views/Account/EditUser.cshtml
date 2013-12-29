@@ -125,6 +125,10 @@
             <td>@Html.LabelFor(m => m.UserName)</td>
             <td>@Model.UserName</td>
         </tr>
+        <tr>
+            <td>@Html.LabelFor(m => m.Notifications)</td>
+            <td>@Html.EditorFor(m => m.Notifications)</td>
+        </tr>
      </table>
 }
 @if (Model.UserInCompetitions != null && Model.UserInCompetitions.Count > 0)

@@ -72,6 +72,21 @@ namespace Sweaty_T_Shirt.DAL
                 .Single(o => o.UserId == userID);
         }
 
+        internal UserProfile UpdateUserNotifications(UserProfile userProfile)
+        {
+            var dbUserProfile = _context.UserProfiles.Single(o => o.UserId == userProfile.UserId);
+            dbUserProfile.Notifications = userProfile.IsImmediateNotification ? null : userProfile.Notifications;
+            _context.SaveChanges();
+            return dbUserProfile;
+        }
+
+        internal void UpdateLastEmailSent(int userID)
+        {
+            var dbUserProfile = _context.UserProfiles.Single(o => o.UserId == userID);
+            dbUserProfile.LastEmailSent = DateTime.Now;
+            _context.SaveChanges();
+        }
+
         /// <summary>
         /// None of the collections are edited.
         /// </summary>
@@ -86,9 +101,10 @@ namespace Sweaty_T_Shirt.DAL
             if (userProfile.UserId == 0)
             {
                 string userName = Guid.NewGuid().ToString();
-                Dictionary<string, object> emailDictionary = new Dictionary<string, object>();
-                emailDictionary.Add("Email", userProfile.Email);
-                membership.CreateUserAndAccount(userName, AccountRepository.AllUsersPassword, emailDictionary);
+                Dictionary<string, object> values = new Dictionary<string, object>();
+                values.Add("Email", userProfile.Email);
+                values.Add("LastEmailSent", DateTime.Now.AddDays(-365));
+                membership.CreateUserAndAccount(userName, AccountRepository.AllUsersPassword, values);
                 if (userProfile.UserRoles.Where(o => o.Selected).Count() > 0)
                 {
                     roles.AddUsersToRoles(new[] { userName }, userProfile.UserRoles.Where(o => o.Selected).Select(o => o.Value).ToArray());
@@ -122,7 +138,7 @@ namespace Sweaty_T_Shirt.DAL
                     {
                         Roles.RemoveUserFromRole(userProfile.UserName, role);
                     }
-                }              
+                }
             }
 
             dbUserProfile.FullName = userProfile.FullName;

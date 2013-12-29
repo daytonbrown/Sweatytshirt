@@ -216,14 +216,18 @@
     <Compile Include="Models\Purr.cs" />
     <Compile Include="Models\SmallException.cs" />
     <Compile Include="Models\SweatyTShirt.cs" />
+    <Compile Include="Models\SweatyTShirtEmail.cs" />
     <Compile Include="Models\UserInCompetition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\Add Column LastEmailSent.sql" />
     <Content Include="App_Data\DeleteUser.sql" />
     <Content Include="App_Data\DropDatabase.sql" />
     <Content Include="App_Data\ELMAH-1.2-db-SQLServer.sql" />
     <Content Include="App_Data\Elmah.sql" />
+    <Content Include="App_Data\SendEmails.sql" />
+    <Content Include="App_Data\ViewErrorLog.sql" />
     <Content Include="App_Data\ViewUser.sql" />
     <Content Include="Content\colorbox.css" />
     <Content Include="Content\images\border.png" />
@@ -384,7 +388,6 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="Views\Shared\_Purr.cshtml" />
-    <Content Include="Views\SendMail\SweatyTShirtAdded.cshtml" />
     <Content Include="Views\SendMail\_Layout.cshtml" />
     <Content Include="Views\Competition\UserInCompetitions.cshtml" />
     <Content Include="Views\Shared\_CompetitionProgressBars.cshtml" />
@@ -397,7 +400,9 @@
     <Content Include="Views\Shared\_Layout.Mobile.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.Mobile.cshtml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Images\CompetitionImages\" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
   </ItemGroup>

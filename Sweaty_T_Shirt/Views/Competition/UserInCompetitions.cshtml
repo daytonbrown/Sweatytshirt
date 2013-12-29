@@ -21,6 +21,13 @@
                 return false;
             });
 
+            /*this re-wires the competition link to do a colorbox popup instead of posting back to server.*/
+            $('a.edit-competition-popup').on('click', function () {
+                $.colorbox({ href: $(this).attr('href'), open: true, iframe: true, scrolling: true, width: '775px', height: "700px" });
+                return false;
+            });
+
+
         });
     </script>
 }
@@ -50,7 +57,7 @@
         rowStyle: "webgrid-row",
         alternatingRowStyle: "webgrid-alternating-row",
         columns: grid.Columns(
-        grid.Column(header: "Competition", format: item => item.Competition.Name),
+        grid.Column(header: "Competition", format: item => Html.ActionLink((string)item.Competition.Name, "EditCompetition", new { competitionID = item.CompetitionID }, new { @class = "edit-competition-popup" })),
                 grid.Column(header: string.Empty, format: item => Html.ActionLink("See Sweaty-T-Shirts", "SweatyTShirts", new { competitionID = item.CompetitionID, }, new { @class = "edit-sweatytshirts-popup" })),
             grid.Column(header: string.Empty, format: item => Html.ActionLink(item.IsActive ? "Deactivate" : "Activate",
                 "ToggleUserInCompetition",

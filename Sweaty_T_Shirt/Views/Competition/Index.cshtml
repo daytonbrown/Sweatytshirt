@@ -8,7 +8,7 @@
         $(document).ready(function () {
             /*this re-wires the "Edit" link to do a colorbox popup instead of posting back to server.*/
             $('a.edit-competition-popup').on('click', function () {
-                $.colorbox({ href: $(this).attr('href'), open: true, iframe: true, scrolling: true, width: '700px', height: "700px" });
+                $.colorbox({ href: $(this).attr('href'), open: true, iframe: true, scrolling: true, width: '775px', height: "700px" });
                 return false;
             });
 
@@ -48,8 +48,7 @@
         rowStyle: "webgrid-row",
         alternatingRowStyle: "webgrid-alternating-row",
         columns: grid.Columns(
-            grid.Column(columnName: "Name", header: "Name"),
-                grid.Column(header: string.Empty, format: item => Html.ActionLink("Edit", "EditCompetition", new { competitionID = item.CompetitionID }, new { @class = "edit-competition-popup" })),
+                grid.Column(header: "Name", format: item => Html.ActionLink((string)item.Name, "EditCompetition", new { competitionID = item.CompetitionID }, new { @class = "edit-competition-popup" })),
             grid.Column(header: string.Empty, format: item => Html.ActionLink(item.IsActive ? "Deactivate" : "Activate",
                 "ToggleCompetition",
                 new { competitionID = item.CompetitionID })),

@@ -7,7 +7,7 @@ left outer join dbo.webpages_Membership wm on up.UserId = wm.UserId
 left outer join dbo.webpages_OAuthMembership wom on up.UserId = wom.UserId
 left outer join dbo.webpages_UsersInRoles wur on up.UserId = wur.UserId
 left outer join dbo.webpages_Roles wr on wur.RoleId = wr.RoleId
-where up.UserID = @UserID
+--where up.UserID = @UserID
 /*
 select * from dbo.webpages_Membership  where UserID = 8 = @UserID
 

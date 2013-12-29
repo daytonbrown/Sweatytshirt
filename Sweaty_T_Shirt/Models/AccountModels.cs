@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataAnnotationsExtensions;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -51,6 +52,15 @@ namespace Sweaty_T_Shirt.Models
 
         public string Email { get; set; }
         public string FullName { get; set; }
+
+        public DateTime LastEmailSent { get; set; }
+
+        [NotMapped]
+        public bool IsImmediateNotification { get; set; }
+
+        [Display(Name="Notifications")]
+        [Integer(ErrorMessage="Notification setting must be numeric.")]
+        public int? Notifications { get; set; }
 
         /// <summary>
         /// Only used by EditUser page, to add or remove user from role(s).
