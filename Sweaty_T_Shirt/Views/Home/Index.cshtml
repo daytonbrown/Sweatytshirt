@@ -20,7 +20,7 @@
 
             /*this re-wires the competition link to do a colorbox popup instead of posting back to server.*/
             $('a.edit-competition-popup').on('click', function () {
-                $.colorbox({ href: $(this).attr('href'), open: true, iframe: true, scrolling: true, width: '700px', height: "700px" });
+                $.colorbox({ href: $(this).attr('href'), open: true, iframe: true, scrolling: true, width: '775px', height: "700px" });
                 return false;
             });
 
@@ -219,9 +219,9 @@
         <h3><span id="AmountLabel">Submit Sweaty T-Shirt(s) to the selected competition.</span></h3>
         <table style="width:100%;border-collapse:collapse">
             <tr>
-                <td><a id="Amount1" class="amount-link"><img src="~/Images/sweaty_tshirt.jpg"></a></td>
-                <td><a id="Amount2" class="amount-link"><img src="~/Images/sweaty_tshirt.jpg"></a></td>
-                <td><a id="Amount3" class="amount-link"><img src="~/Images/sweaty_tshirt.jpg"></a></td>
+                <td><a id="Amount1" class="amount-link"><img src="@Sweaty_T_Shirt.Controllers.ControllerHelpers.GetImageSrc(Model.Competition.ImageSrc)"></a></td>
+                <td><a id="Amount2" class="amount-link"><img src="@Sweaty_T_Shirt.Controllers.ControllerHelpers.GetImageSrc(Model.Competition.ImageSrc)"></a></td>
+                <td><a id="Amount3" class="amount-link"><img src="@Sweaty_T_Shirt.Controllers.ControllerHelpers.GetImageSrc(Model.Competition.ImageSrc)"></a></td>
             </tr>
         </table>
         <div>

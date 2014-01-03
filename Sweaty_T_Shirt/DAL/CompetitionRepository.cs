@@ -15,6 +15,11 @@ namespace Sweaty_T_Shirt.DAL
 {
     public class CompetitionRepository : BaseRepository
     {
+        public List<SweatyTShirtEmail> SweatyTShirtEmails()
+        {
+            return _context.Database.SqlQuery<SweatyTShirtEmail>("dbo.SendEmails").ToList();
+        }
+
         public List<UserInCompetition> GetUserInCompetitionsForUser(int userID)
         {
             //use Include to eager load the desired related object.  Because it is declared "virtual" it is 
@@ -31,9 +36,11 @@ namespace Sweaty_T_Shirt.DAL
 
         public Competition GetCompetition(long competitionID)
         {
-            return _context.Competitions.Include(o => o.UserInCompetitions.Select(uic => uic.UserProfile))
+            var competition =  _context.Competitions.Include(o => o.UserInCompetitions.Select(uic => uic.UserProfile))
                 .Include(o => o.UserProfile)
                 .FirstOrDefault(o => o.CompetitionID == competitionID);
+
+            return competition;
         }
 
         public UserInCompetition GetUserInCompetition(long competitionID, int userID)
@@ -43,6 +50,7 @@ namespace Sweaty_T_Shirt.DAL
                 .FirstOrDefault(o => o.CompetitionID == competitionID
                 && o.UserID == userID);
         }
+
 
         public List<SweatyTShirt> GetSweatyTShirtsInCompetition(long competionID)
         {
@@ -123,6 +131,8 @@ If you want the SQL Update statement to update only the fields that the user act
                 c.Property(o => o.Description).IsModified = true;
                 c.Property(o => o.Points).CurrentValue = competition.Points;
                 c.Property(o => o.Points).IsModified = true;
+                c.Property(o => o.ImageSrc).CurrentValue = competition.ImageSrc;
+                c.Property(o => o.ImageSrc).IsModified = true;
                 c.Property(o => o.IsActive).CurrentValue = competition.IsActive;
                 c.Property(o => o.IsActive).IsModified = true;
                 c.Property(o => o.Name).CurrentValue = competition.Name;
@@ -153,6 +163,7 @@ If you want the SQL Update statement to update only the fields that the user act
             }
 
             _context.SaveChanges();
+            
         }
 
         public bool ToggleCompetition(long competitionID)

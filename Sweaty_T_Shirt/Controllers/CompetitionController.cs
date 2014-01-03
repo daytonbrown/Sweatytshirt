@@ -7,6 +7,7 @@ using WebMatrix.WebData;
 using Sweaty_T_Shirt.Models;
 using System.Data.Entity;
 using Sweaty_T_Shirt.DAL;
+using System.IO;
 
 namespace Sweaty_T_Shirt.Controllers
 {
@@ -57,15 +58,17 @@ namespace Sweaty_T_Shirt.Controllers
                     {
                         throw new ApplicationException(string.Format("Unable to retrieve Competition object for competitionID: ",competitionID));
                     }
-
+                    competition.UseDefaultImage = competition.IsUsingDefaultImage();
                     competition.CompetitionProgressBars =
                         ControllerHelpers.GetCompetitionProgressBars(repository,
                         competitionID);
+                    ViewBag.AllowEdit = (IsUserAdmin || competition.CreatorUserID == UserID);
                 }
             }
             else
             {
                 competition = new Competition() {IsActive = true };
+                ViewBag.AllowEdit = true;
             }
 
             //if another method redirected to here show the purr message
@@ -84,8 +87,46 @@ namespace Sweaty_T_Shirt.Controllers
         /// to create a new object.
         /// </summary>
         [HttpPost]
-        public ActionResult EditCompetition(Competition competition)
+        public ActionResult EditCompetition(Competition competition, HttpPostedFileBase CustomImage)
         {
+            if (!IsUserAdmin && competition.CompetitionID > 0 && competition.CreatorUserID != UserID)
+            {
+                throw new ApplicationException(string.Format("Possible security breach, User {0} attempted to edit Competition {1}.", UserID, competition.CompetitionID));
+            }
+
+            if (!competition.UseDefaultImage && CustomImage != null)
+            {
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(CustomImage.FileName);
+
+                string filePath = string.Format(@"{0}\{1}\{2}",
+                    System.Web.HttpContext.Current.Request.PhysicalApplicationPath,
+                    ControllerHelpers.CustomImageFolder,
+                    fileName);
+
+                if (ControllerHelpers.SaveImage(CustomImage.InputStream, filePath))
+                {
+                    competition.ImageSrc = fileName;
+                }
+            }
+            else if (competition.UseDefaultImage && !string.IsNullOrEmpty(competition.ImageSrc))
+            {
+                string filePath = string.Format(@"{0}\{1}\{2}",
+                    System.Web.HttpContext.Current.Request.PhysicalApplicationPath,
+                    ControllerHelpers.CustomImageFolder,
+                    competition.ImageSrc);
+
+                try
+                {
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
+                }
+                catch{ }
+                competition.ImageSrc = null;
+            }
+
+
             using (CompetitionRepository repository = new CompetitionRepository())
             {
                 if (competition.CompetitionID <= 0)
@@ -96,6 +137,7 @@ namespace Sweaty_T_Shirt.Controllers
                 repository.SaveCompetition(competition);
             }
 
+            
             //the ClosePopup closes EditCompetition.cshtml and causes Index.cshtml to refresh, 
             //which in turn calls the Index action.
             //cannot just set ViewBag because it is lost on redirect.

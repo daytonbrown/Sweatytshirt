@@ -37,9 +37,10 @@ namespace Sweaty_T_Shirt.DAL
             SweatyTShirtContext context)
         {
             string userName = Guid.NewGuid().ToString();
-            Dictionary<string, object> emailDictionary = new Dictionary<string, object>();
-            emailDictionary.Add("Email", email);
-            membership.CreateUserAndAccount(userName, AccountRepository.AllUsersPassword, emailDictionary);
+            Dictionary<string, object> values = new Dictionary<string, object>();
+            values.Add("Email", email);
+            values.Add("LastEmailSent", DateTime.Now.AddDays(-365));
+            membership.CreateUserAndAccount(userName, AccountRepository.AllUsersPassword, values);
             roles.AddUsersToRoles(new[] { userName }, new[] { AccountRepository.UserRole });
             UserProfile userProfile =  context.UserProfiles.FirstOrDefault(o => o.Email == email);
             userProfile.FullName = fullName;
@@ -116,9 +117,10 @@ namespace Sweaty_T_Shirt.DAL
 
             #region create administrator
             roles.CreateRole(AccountRepository.AdminRole);
-            Dictionary<string, object> email = new Dictionary<string, object>();
-            email.Add("Email", AdminEmail);
-            membership.CreateUserAndAccount(AdminUserName, AccountRepository.AllUsersPassword, email);
+            Dictionary<string, object> values = new Dictionary<string, object>();
+            values.Add("Email", AdminEmail);
+            values.Add("LastEmailSent", DateTime.Now.AddDays(-365));
+            membership.CreateUserAndAccount(AdminUserName, AccountRepository.AllUsersPassword, values);
             roles.AddUsersToRoles(new[] { AdminUserName }, new[] { AccountRepository.AdminRole });
             #endregion
 

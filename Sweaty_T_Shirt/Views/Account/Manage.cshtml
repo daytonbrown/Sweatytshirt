@@ -1,25 +1,65 @@
-﻿@model Sweaty_T_Shirt.Models.LocalPasswordModel
+﻿@model Sweaty_T_Shirt.Models.UserProfile
 @using Sweaty_T_Shirt.DAL;
 @{
-    var userProfile = new AccountRepository().GetUserProfile(User.Identity.Name);
     ViewBag.Title = "Manage Account";
 }
-
-<hgroup class="title">
-    <h1>@ViewBag.Title.</h1>
-</hgroup>
-
-<p class="message-success">@ViewBag.StatusMessage</p>
-
-<p>You're logged in as <strong>@userProfile.FullName (@userProfile.Email)</strong>.</p>
-
-<section id="externalLogins">
-    @Html.Action("RemoveExternalLogins")
-
-    <h3>Add an external login</h3>
-    @Html.Action("ExternalLoginsList", new { ReturnUrl = ViewBag.ReturnUrl })
-</section>
-
-@section Scripts {
+@section scripts 
+{
     @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if ($('input[name=IsImmediateNotification]').val() == "true") {
+                $('#Notifications').prop('disabled', true);
+            }
+            else {
+                $('#Notifications').prop('disabled', false);
+            }
+
+            $('input[name=IsImmediateNotification]').click(function () {
+                if ($(this).val() == "true") {
+                    $('#Notifications').prop('disabled', true);
+                }
+                else {
+                    $('#Notifications').prop('disabled', false);
+                }
+            });
+
+        });
+    </script>
 }
+<style type="text/css">
+    li {
+        list-style-type:none;
+    }
+</style>
+        <hgroup class="title">
+            <h1>@ViewBag.Title.</h1>
+        </hgroup>
+
+        <p>You're logged in as <strong>@Model.FullName (@Model.Email)</strong>.</p>
+
+        @using (Html.BeginForm("Manage", "Account", FormMethod.Post))
+{
+    @Html.HiddenFor(m => m.UserId)
+            @Html.HiddenFor(m => m.Email)
+            @Html.HiddenFor(m => m.FullName)
+            @Html.HiddenFor(m => m.UserName)
+    <div>
+	    <span class="message-error">@Html.ValidationSummary(false, "Please correct the following.")</span>
+	</div>
+    <div>
+            When a Sweaty T-Shirt is submitted:
+            <ul>
+                <li>@Html.RadioButtonFor(m => m.IsImmediateNotification, "true") <span>Notify Me Immediately</span></li>
+                <li>@Html.RadioButtonFor(m => m.IsImmediateNotification, "false") <span>Notify Me Every</span> @Html.TextBoxFor(m => m.Notifications, new { @class = "numeric" })<span>Hours</span></li>
+            </ul>
+    </div>
+    <button id="Save" type="submit" value="Save">Save</button>
+}
+
+        <section id="externalLogins">
+            @Html.Action("RemoveExternalLogins")
+
+            <h3>Add an external login</h3>
+        @Html.Action("ExternalLoginsList", new { ReturnUrl = ViewBag.ReturnUrl })
+        </section>

@@ -261,16 +261,26 @@ namespace Sweaty_T_Shirt.Controllers
         //
         // GET: /Account/Manage
 
-        public ActionResult Manage(ManageMessageId? message)
+        public ActionResult Manage()
         {
-            ViewBag.StatusMessage =
-                message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
-                : message == ManageMessageId.SetPasswordSuccess ? "Your password has been set."
-                : message == ManageMessageId.RemoveLoginSuccess ? "The external login was removed."
-                : "";
-            ViewBag.HasLocalPassword = OAuthWebSecurity.HasLocalAccount(UserID);
             ViewBag.ReturnUrl = Url.Action("Manage");
-            return View();
+            var model = new AccountRepository().GetUserProfile(User.Identity.Name);
+            model.IsImmediateNotification = !(model.Notifications > 0);
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult Manage(UserProfile userProfile)
+        {
+            //the only thing the user can edit is Notifications.
+            using (AccountRepository accountRepository = new AccountRepository())
+            {
+                var model = accountRepository.UpdateUserNotifications(userProfile);
+                model.IsImmediateNotification = !(model.Notifications > 0);
+                ViewBag.Purr = new Purr() { Title = "Success", Message = "Notifications successfully saved." };
+                ModelState.Clear();
+                return View(model);
+            }
         }
 
         //
@@ -278,7 +288,7 @@ namespace Sweaty_T_Shirt.Controllers
 
         [HttpPost]
         //[ValidateAntiForgeryToken]
-        public ActionResult Manage(LocalPasswordModel model)
+        public ActionResult OLDManage(LocalPasswordModel model)
         {
             bool hasLocalAccount = OAuthWebSecurity.HasLocalAccount(UserID);
             ViewBag.HasLocalPassword = hasLocalAccount;

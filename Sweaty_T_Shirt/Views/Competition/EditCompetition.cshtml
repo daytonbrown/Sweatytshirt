@@ -2,7 +2,8 @@
 @{
     Layout = "~/Views/Shared/_LayoutIFrame.cshtml";
     ViewBag.Title = "Edit Competition";
-    var goal = (Model.Points.HasValue? Model.Points.Value : Model.MaxPoints);
+    var goal = (Model.Points.HasValue ? Model.Points.Value : Model.MaxPoints);
+    bool allowEdit = (bool)ViewBag.AllowEdit;
 }
 
 @section scripts {
@@ -11,6 +12,32 @@
         $(document).ready(function () {
             $('#Cancel').click(function () {
                 parent.$.colorbox.close();
+            });
+
+            if ($('input[name=UseDefaultImage]').val() == "true") {
+                $('#custom-image-cell').prop('disabled', true);
+                $('#custom-image-cell input').prop('disabled', true);
+                $('#custom-image-cell img').prop('disabled', true);
+            }
+            else {
+                $('#custom-image-cell').prop('disabled', false);
+                $('#custom-image-cell input').prop('disabled', false);
+                $('#custom-image-cell img').prop('disabled', false);
+
+            }
+
+            $('input[name=UseDefaultImage]').click(function () {
+                if ($(this).val() == "true") {
+                    $('#custom-image-cell').prop('disabled', true);
+                    $('#custom-image-cell input').prop('disabled', true);
+                    $('#custom-image-cell img').prop('disabled', true);
+                }
+                else {
+                    $('#custom-image-cell').prop('disabled', false);
+                    $('#custom-image-cell input').prop('disabled', false);
+                    $('#custom-image-cell img').prop('disabled', false);
+
+                }
             });
 
             //sets up the progress bars on partial view.
@@ -65,7 +92,7 @@
 
 <h2>Edit Competition</h2>
 
-@using (Html.BeginForm("EditCompetition", "Competition", FormMethod.Post))
+@using (Html.BeginForm("EditCompetition", "Competition", FormMethod.Post, new {@enctype="multipart/form-data" }))
 {
     @Html.HiddenFor(m => m.CompetitionID)
     <div>
@@ -74,12 +101,15 @@
     
     <table>
 	    <tr>
+            @if(allowEdit)
+            { 
 		    <td><button id="Save" type="submit" value="Save">Save</button></td>
+            }
             <td><button id="Cancel" type="button" value="Cancel">Close</button></td>
 	    </tr>
     </table>
     
-    <table>
+    <table style="width:100%">
         <tr>
             <td>@Html.LabelFor(m => m.Name)</td>
             <td>@Html.EditorFor(m => m.Name)</td>
@@ -100,26 +130,62 @@
             <td>@Html.LabelFor(m => m.IsActive)</td>
             <td>@Html.EditorFor(m => m.IsActive)</td>
         </tr>
+        <tr>
+            <td>@Html.LabelFor(o => o.ImageSrc)
+                @Html.HiddenFor(o => o.ImageSrc)</td>
+            <td>
+            <table style="width:100%">
+                <tr>
+
+                    <td><label>Default</label>@Html.RadioButtonFor(m => m.UseDefaultImage, "true")</td>
+                    <td><label>Custom</label>@Html.RadioButtonFor(m => m.UseDefaultImage, "false")</td>
+                </tr>
+                <tr>
+                    <td><img src='@Sweaty_T_Shirt.Controllers.ControllerHelpers.GetImageSrc(null)' width="50" height="44" /></td>
+                    <td id="custom-image-cell">
+                        @if (!string.IsNullOrEmpty(Model.ImageSrc))
+                        {
+                            <img src='@Sweaty_T_Shirt.Controllers.ControllerHelpers.GetImageSrc(Model.ImageSrc)' width="50" height="44" />
+                        }
+                        <input type="file" id="CustomImage" name="CustomImage" /> </td>
+                </tr>
+            </table>
+            </td>
+        </tr>
     </table>
 }
 @if (Model.CompetitionID > 0)
-{
+{ 
     <fieldset>
         <legend>Users</legend>
+        @if(allowEdit)
+        { 
         <p>@Html.ActionLink("Add User To Competition", "AddUserInCompetition", new { competitionID = Model.CompetitionID }, new { @class = "add-userincompetition-popup" })</p>
-        @if (Model.UserInCompetitions != null && Model.UserInCompetitions.Count > 0)
+        if (Model.UserInCompetitions != null && Model.UserInCompetitions.Count > 0)
         {
             var grid = new WebGrid(Model.UserInCompetitions, canPage: false, canSort: false);
             @grid.GetHtml(tableStyle: "webgrid",
                 rowStyle: "webgrid-row",
-                alternatingRowStyle: "webgrid-alternating-row",
-                columns: grid.Columns(
+                alternatingRowStyle: "webgrid-alternating-row",                columns: grid.Columns(
                             grid.Column(columnName: "UserProfile.FullName", header: "User Name"),
                             grid.Column(header: string.Empty, format: item => Html.ActionLink(item.IsActive ? "Deactivate" : "Activate",
                                     "ToggleUserInCompetition",
                                     new { competitionID = item.CompetitionID, userID = item.UserID, redirectToAction = "EditCompetition" })),
                                           grid.Column(header: string.Empty, format: item => Html.ActionLink("Delete", "DeleteUserInCompetition", new { competitionID = item.CompetitionID, userID = item.UserID, redirectToAction = "EditCompetition" }, new { @class = "delete-userincompetition-warning", @userFullName = item.UserProfile.FullName }))
             ))
+        }
+        }
+        else
+        {
+            if (Model.UserInCompetitions != null && Model.UserInCompetitions.Count > 0)
+        {
+            var grid = new WebGrid(Model.UserInCompetitions, canPage: false, canSort: false);
+            @grid.GetHtml(tableStyle: "webgrid",
+                rowStyle: "webgrid-row",
+                alternatingRowStyle: "webgrid-alternating-row",                columns: grid.Columns(
+                            grid.Column(columnName: "UserProfile.FullName", header: "User Name")
+            ))
+        }
         }
     </fieldset>
     if (Model.CompetitionProgressBars != null && Model.CompetitionProgressBars.Count > 0)

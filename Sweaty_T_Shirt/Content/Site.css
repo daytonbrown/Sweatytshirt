@@ -449,6 +449,15 @@ input, textarea {
     width: 300px;
 }
 
+    input[type="radio"] {
+        width:auto;
+        white-space:nowrap;
+    }
+
+    input[type="text"].numeric {
+        width:50px;
+    }
+
 textarea {
     font-family: inherit;
     width: 500px;

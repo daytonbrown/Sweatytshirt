@@ -131,7 +131,7 @@
         </table>
         <div>
             @Html.LabelFor(m => m.Description, new { @style = "display:inline" }):&nbsp;@Html.TextBoxFor(m => m.Description, new { @style = "display:inline" })
-            <br />@Html.LabelFor(m => m.SendEmail, new { @style = "display:inline" }) &nbsp;@Html.EditorFor(m => m.SendEmail, new { @style = "display:inline" })
+            
             @if(isFacebookAuthenticated)
             {
                 <text>

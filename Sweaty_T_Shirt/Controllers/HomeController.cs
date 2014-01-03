@@ -24,7 +24,6 @@ namespace Sweaty_T_Shirt.Controllers
                 if (sweatyTShirt.IsSave)
                 {
                     sweatyTShirt.CreatedDate = DateTime.Now;
-                    sweatyTShirt.SendEmail = true;  //per Dayton
                     competitionRepository.AddSweatyTShirt(sweatyTShirt);
                     ViewBag.Purr = new Purr() { Title = "Success", Message = "Sweaty-T-Shirt was successfully added." };
                 }
@@ -57,20 +56,7 @@ namespace Sweaty_T_Shirt.Controllers
                     
                     if (sweatyTShirt.IsSave)
                     {
-                        if (sweatyTShirt.SendEmail)
-                        {
-                            SendMail sendMail = new SendMail();
-
-                            foreach (CompetitionProgressBar cpb in sweatyTShirt.Competition.CompetitionProgressBars)
-                            {
-                                using (var msg = sendMail.SweatyTShirtAdded(sweatyTShirt, cpb, true))
-                                {
-                                   // msg.SendAsync( userState: sweatyTShirt.UserProfile.Email);
-                                    msg.Send();
-                                   // msg.Dispose();
-                                }
-                            }
-                        }
+                        /* emails are sent in separate thread, see global.asax.cs*/
                         if (sweatyTShirt.PostToFacebook)
                         {
                             FacebookRepository.PostToFacebook(sweatyTShirt);

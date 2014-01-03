@@ -21,7 +21,6 @@ namespace Sweaty_T_Shirt.Models
                 PostToFacebook = (HttpContext.Current.Session[FacebookRepository.IS_FB_AUTHENTICATED] != null
                     && (bool)HttpContext.Current.Session[FacebookRepository.IS_FB_AUTHENTICATED] == true);
             }
-            SendEmail = true;
         }
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
@@ -74,12 +73,6 @@ namespace Sweaty_T_Shirt.Models
         ///DefaultValue has no effect, but could write code to make it set default value:  http://stackoverflow.com/questions/7637022/default-value-in-an-asp-net-mvc-view-model
         ///[DefaultValue(false)]
         public virtual bool IsSave { get; set; }
-
-        [NotMapped]
-        [Display(Name = "Send Email Notification to all Competitors?")]
-        ///DefaultValue has no effect, but could write code to make it set default value:  http://stackoverflow.com/questions/7637022/default-value-in-an-asp-net-mvc-view-model
-        ///[DefaultValue(true)]
-        public bool SendEmail { get; set; }
 
         [NotMapped]
         [Display(Name = "Post to Facebook Wall?")]
