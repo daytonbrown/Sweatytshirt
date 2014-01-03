@@ -74,6 +74,7 @@ namespace Sweaty_T_Shirt.Models
         public bool UseDefaultImage {get;set;}
 
         [Display(Name = "Competition Icon")]
+        [StringLength(500)]
         public string ImageSrc { get; set; }
 
         [Display(Name = "Points")]
